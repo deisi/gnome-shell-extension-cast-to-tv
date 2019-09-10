@@ -54,10 +54,17 @@ class CastToTVMenu(GObject.Object, FileManager.MenuProvider):
 
         try:
             locale.setlocale(locale.LC_ALL, '')
-            gettext.bindtextdomain('cast-to-tv', EXTENSION_PATH + '/locale')
-            gettext.textdomain('cast-to-tv')
-        except:
+        except locale.Error:
             pass
+        try:
+            gettext.bindtextdomain('cast-to-tv', EXTENSION_PATH + '/locale')
+        # OSError raised on gettext version >= 3.3
+        except OSError:
+            pass
+        # IOError raised on gettext version < 3.3
+        except IOError:
+            pass
+        gettext.textdomain('cast-to-tv')
 
     def check_extension_enabled(self):
         all_extensions_disabled = self.settings.get_boolean(
